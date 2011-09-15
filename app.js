@@ -21,32 +21,31 @@ var express = require('express'),
 emails = {
   send: function(template, mailOptions, templateOptions) {
     mailOptions.to = mailOptions.to;
-    jade.renderFile(path.join(__dirname, 'views', 'mailer', template), templateOptions, function(err, text) {
+	var text = jade.compile(path.join(__dirname, 'views', 'mailer', template), templateOptions);
       // Add the rendered Jade template to the mailOptions
-      mailOptions.body = text;
+    mailOptions.body = text;
 
       // Merge the app's mail options
-      var keys = Object.keys(app.set('mailOptions')),
-          k;
-      for (var i = 0, len = keys.length; i < len; i++) {
-        k = keys[i];
-        if (!mailOptions.hasOwnProperty(k))
-          mailOptions[k] = app.set('mailOptions')[k]
-      }
+    var keys = Object.keys(app.set('mailOptions')),
+        k;
+    for (var i = 0, len = keys.length; i < len; i++) {
+      k = keys[i];
+      if (!mailOptions.hasOwnProperty(k))
+        mailOptions[k] = app.set('mailOptions')[k]
+    }
 
-      console.log('[SENDING MAIL]', sys.inspect(mailOptions));
+    console.log('[SENDING MAIL]', sys.inspect(mailOptions));
 
       // Only send mails in production
-      if (app.settings.env == 'production') {
-        mailer.send(mailOptions,
-          function(err, result) {
-            if (err) {
-              console.log(err);
-            }
+    if (app.settings.env == 'production') {
+      mailer.send(mailOptions,
+        function(err, result) {
+          if (err) {
+            console.log(err);
           }
-        );
-      }
-    });
+        }
+      );
+    }
   },
 
   sendWelcome: function(user) {
